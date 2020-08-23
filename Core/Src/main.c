@@ -110,7 +110,11 @@ int main(void)
   {
     /* USER CODE END WHILE */
     HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-    /* Insert delay 100 ms */
+
+    uint8_t test_tx_data[] = "test. ";
+
+    HAL_UART_Transmit(&huart2, test_tx_data, sizeof(test_tx_data), 1000);
+
     HAL_Delay(500);
 
     /* USER CODE BEGIN 3 */
