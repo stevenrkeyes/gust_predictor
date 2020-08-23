@@ -102,6 +102,13 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  // ADC calibration seems to reduce the noise by several bits
+  if (HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED) != HAL_OK)
+  {
+    /* Calibration Error */
+    Error_Handler();
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,11 +116,14 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+    HAL_ADC_Start(&hadc);
+    HAL_ADC_PollForConversion(&hadc, 1000);
+    uint16_t adc_value = HAL_ADC_GetValue(&hadc);
+
+    HAL_UART_Transmit(&huart2, (uint8_t *) &adc_value, 2, 1000);
+
     HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-
-    uint8_t test_tx_data[] = "test. ";
-
-    HAL_UART_Transmit(&huart2, test_tx_data, sizeof(test_tx_data), 1000);
 
     HAL_Delay(500);
 
