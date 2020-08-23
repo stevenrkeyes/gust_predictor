@@ -109,6 +109,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+    /* Insert delay 100 ms */
+    HAL_Delay(500);
 
     /* USER CODE BEGIN 3 */
   }
