@@ -62,6 +62,8 @@ void Error_Handler(void);
 #define VCP_TX_GPIO_Port GPIOA
 #define DAC_Pin GPIO_PIN_1
 #define DAC_GPIO_Port GPIOB
+#define Radio_NSS_Pin GPIO_PIN_4
+#define Radio_NSS_GPIO_Port GPIOA
 #define Radio_IRQ_Pin GPIO_PIN_8
 #define Radio_IRQ_GPIO_Port GPIOA
 #define Aux_Out_1_Pin GPIO_PIN_11

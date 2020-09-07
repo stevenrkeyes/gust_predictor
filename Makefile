@@ -59,7 +59,8 @@ Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_tim.c \
 Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_tim_ex.c \
 Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_uart.c \
 Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_uart_ex.c \
-Core/Src/system_stm32l0xx.c  
+Drivers/nrf24l01/Src/nrf24l01.c \
+Core/Src/system_stm32l0xx.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -121,7 +122,7 @@ C_INCLUDES =  \
 -IDrivers/STM32L0xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32L0xx/Include \
 -IDrivers/CMSIS/Include \
--IDrivers/CMSIS/Include
+-IDrivers/nrf24l01/Inc
 
 
 # compile gcc flags
@@ -187,10 +188,9 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
-  
+
 #######################################
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
 
-# *** EOF ***

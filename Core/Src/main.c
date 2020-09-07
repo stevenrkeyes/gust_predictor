@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "nrf24l01.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,6 +68,15 @@ static void MX_USART2_UART_Init(void);
 
 /* USER CODE END 0 */
 
+void uint16_to_hex(uint8_t dest[], uint16_t value)
+{
+  uint8_t HEX_DIGITS[] = "0123456789abcdef";
+  dest[3] = HEX_DIGITS[(value & 0x000F) >> 0];
+  dest[2] = HEX_DIGITS[(value & 0x00F0) >> 4];
+  dest[1] = HEX_DIGITS[(value & 0x0F00) >> 8];
+  dest[0] = HEX_DIGITS[(value & 0xF000) >> 12];
+}
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -109,10 +118,51 @@ int main(void)
     Error_Handler();
   }
 
+  // Initialize the radio driver
+  // Todo: would be good to break all these initialization values out into a struct or something
+  nRF24_Init(&hspi1, GPIOA, Aux_Out_1_Pin, GPIOA, Radio_NSS_Pin);
+
+  uint8_t check_result = nRF24_Check();
+  if (check_result == 1) {
+    HAL_UART_Transmit(&huart2, (uint8_t *)"radio good\n", 11, 1000);
+  } else {
+    HAL_UART_Transmit(&huart2, (uint8_t *)"radio bad\n", 10, 1000);
+  }
+
+  nRF24_Start();
+
+  // The transmitter sends a 5-byte packets to the address '0xE7 0x1C 0xE3' without Auto-ACK (ShockBurst disabled)
+  // Enable ShockBurst (which includes ack packets) for all RX pipes
+  nRF24_EnableAA(0xFF);
+  // Set RF channel
+  nRF24_SetRFChannel(115);
+  // Set data rate
+  nRF24_SetDataRate(nRF24_DR_1Mbps);
+  // Set CRC scheme
+  nRF24_SetCRCScheme(nRF24_CRC_2byte);
+  // Set address width, its common for all pipes (RX and TX)
+  nRF24_SetAddrWidth(5);
+  // Configure TX PIPE
+  static const uint8_t nRF24_ADDR[] = { 0x01, 0x01, 0x01, 0x01, 0x01 };
+  nRF24_SetAddr(nRF24_PIPETX, nRF24_ADDR);
+  // Pipe 0 must be configured the same address as TX to receive the ack packet
+  nRF24_SetAddr(nRF24_PIPE0, nRF24_ADDR);
+
+  // Set TX power (maximum)
+  nRF24_SetTXPower(nRF24_TXPWR_0dBm);
+  // Set operational mode (PTX == transmitter)
+  nRF24_SetOperationalMode(nRF24_MODE_TX);
+  // Clear any pending IRQ flags
+  nRF24_ClearIRQFlags();
+  // Wake the transceiver
+  nRF24_SetPowerMode(nRF24_PWR_UP);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  // Counter to generate dummy data
+  int j=0;
   while (1)
   {
     /* USER CODE END WHILE */
@@ -121,7 +171,39 @@ int main(void)
     HAL_ADC_PollForConversion(&hadc, 1000);
     uint16_t adc_value = HAL_ADC_GetValue(&hadc);
 
-    HAL_UART_Transmit(&huart2, (uint8_t *) &adc_value, 2, 1000);
+    uint8_t adc_value_as_hex[4];
+    uint16_to_hex(adc_value_as_hex, adc_value);
+
+    HAL_UART_Transmit(&huart2, adc_value_as_hex, sizeof(adc_value_as_hex), 1000);
+    HAL_UART_Transmit(&huart2, (uint8_t *) "\n", 1, 1000);
+
+    // Prepare data packet with dummy data
+    uint8_t nRF24_payload[32];
+    int payload_length = 5;
+    for (int payload_byte_index = 0;
+      payload_byte_index < payload_length;
+      payload_byte_index++) {
+        nRF24_payload[payload_byte_index] = j++;
+        if (j > 0x000000FF) j = 0;
+    }
+
+    // Transmit a packet
+    nRF24_TXResult transmit_result = nRF24_TransmitPacket(nRF24_payload, payload_length);
+
+    switch (transmit_result) {
+        case nRF24_TX_SUCCESS:
+            HAL_UART_Transmit(&huart2, (uint8_t *) "OK\n", 3, 1000);
+            break;
+        case nRF24_TX_TIMEOUT:
+            HAL_UART_Transmit(&huart2, (uint8_t *) "TIMEOUT\n", 8, 1000);
+            break;
+        case nRF24_TX_MAXRT:
+            HAL_UART_Transmit(&huart2, (uint8_t *) "MAX RETRANSMIT\n", 15, 1000);
+            break;
+        default:
+            HAL_UART_Transmit(&huart2, (uint8_t *) "ERROR\n", 6, 1000);
+            break;
+    }
 
     HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 
@@ -324,7 +406,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_HARD_OUTPUT;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
@@ -390,10 +472,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, Aux_Out_1_Pin|Aux_Out_2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, Radio_NSS_Pin|Aux_Out_1_Pin|Aux_Out_2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LD3_Pin|LED_Other_1_Pin|LED_Other_2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : Radio_NSS_Pin Aux_Out_1_Pin Aux_Out_2_Pin */
+  GPIO_InitStruct.Pin = Radio_NSS_Pin|Aux_Out_1_Pin|Aux_Out_2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DAC_Pin */
   GPIO_InitStruct.Pin = DAC_Pin;
@@ -406,13 +495,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(Radio_IRQ_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : Aux_Out_1_Pin Aux_Out_2_Pin */
-  GPIO_InitStruct.Pin = Aux_Out_1_Pin|Aux_Out_2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD3_Pin LED_Other_1_Pin LED_Other_2_Pin */
   GPIO_InitStruct.Pin = LD3_Pin|LED_Other_1_Pin|LED_Other_2_Pin;
