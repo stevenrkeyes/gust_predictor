@@ -14,7 +14,7 @@ if not pi.connected:
     exit()
 
 # Set up NRF24L01 module for reading. The default SPI peripheral to use is correct.
-radio = nrf24.NRF24(pi,ce=25, data_rate=nrf24.RF24_DATA_RATE.RATE_1MBPS, channel=115, payload_size=5)
+radio = nrf24.NRF24(pi,ce=25, data_rate=nrf24.RF24_DATA_RATE.RATE_1MBPS, channel=115, payload_size=nrf24.RF24_PAYLOAD.DYNAMIC)
 
 # The reading pipe must be set to the same channel as the RX and TX channels of
 # the sender, but it seems that the writing pipe can be set to anything

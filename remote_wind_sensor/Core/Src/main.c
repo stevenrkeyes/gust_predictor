@@ -147,6 +147,8 @@ int main(void)
   nRF24_SetAddr(nRF24_PIPETX, nRF24_ADDR);
   // Pipe 0 must be configured the same address as TX to receive the ack packet
   nRF24_SetAddr(nRF24_PIPE0, nRF24_ADDR);
+  // Enable the payload length to be dynamic
+  nRF24_SetDynamicPayloadLength(1);
 
   // Set TX power (maximum)
   nRF24_SetTXPower(nRF24_TXPWR_0dBm);
