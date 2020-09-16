@@ -1,6 +1,7 @@
 import pigpio
 import nrf24
 from os import environ as env
+import struct
 
 # Raspberry Pi 3 B+ Pin Connections:
 # Pin 24 - CSN
@@ -29,12 +30,16 @@ while True:
     while radio.data_ready():
         # Get pipe, packet.
         pipe = radio.data_pipe()
-        report_packet = radio.get_payload()
+        report_packet_flattened_struct = radio.get_payload()
+
+        # Unpack the data, which is a uint8 ('B') and a uint16 ('h')
+        report_packet = struct.unpack('=Bh', report_packet_flattened_struct)
 
         # The radio payload is a wind report packet consisting of device ID and data
         device_id = report_packet[0]
+        wind_measurement_raw = report_packet[1]
 
         pipe_string = "Pipe " + str(pipe)
         device_string = "Device " + str(device_id).zfill(3)
-        data_string = hex(report_packet[1]) + " " + hex(report_packet[2])
+        data_string = str(wind_measurement_raw)
         print(", ".join([pipe_string, device_string, data_string]))

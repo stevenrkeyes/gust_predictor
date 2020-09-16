@@ -163,8 +163,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  // Counter to generate dummy data
-  int j=0;
   while (1)
   {
     /* USER CODE END WHILE */
@@ -180,21 +178,17 @@ int main(void)
     HAL_UART_Transmit(&huart2, (uint8_t *) "\n", 1, 1000);
 
     // Prefix payload with Device ID
-    uint8_t report_packet[3];
-    report_packet[0] = DEVICE_ID;
+    #pragma pack(1)
+    struct remote_report_packet {
+      uint8_t device_id;
+      uint16_t wind_measurement_raw;
+    } report_packet;
 
-    // Fill payload of packet with dummy data
-    report_packet[1] = j;
-    j++;
-    report_packet[2] = j;
-    j++;
-    if (j > 0x000000FF)
-    {
-      j = 0;
-    }
+    report_packet.device_id = DEVICE_ID;
+    report_packet.wind_measurement_raw = adc_value;
 
     // Transmit a packet
-    nRF24_TXResult transmit_result = nRF24_TransmitPacket(report_packet, sizeof(report_packet));
+    nRF24_TXResult transmit_result = nRF24_TransmitPacket((uint8_t *) &report_packet, sizeof(report_packet));
 
     switch (transmit_result) {
         case nRF24_TX_SUCCESS:
