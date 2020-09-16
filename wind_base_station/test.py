@@ -27,11 +27,14 @@ print("Starting loop")
 
 while True:
     while radio.data_ready():
-        # Get pipe, payload.
+        # Get pipe, packet.
         pipe = radio.data_pipe()
-        payload = radio.get_payload()
+        report_packet = radio.get_payload()
 
-        # Convert data to hex.
-        hex = ':'.join(f'{i:02x}' for i in payload)
+        # The radio payload is a wind report packet consisting of device ID and data
+        device_id = report_packet[0]
 
-        print(f'Data received on pipe {pipe}: {hex}')
+        pipe_string = "Pipe " + str(pipe)
+        device_string = "Device " + str(device_id).zfill(3)
+        data_string = hex(report_packet[1]) + " " + hex(report_packet[2])
+        print(", ".join([pipe_string, device_string, data_string]))

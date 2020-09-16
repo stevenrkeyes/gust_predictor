@@ -179,18 +179,22 @@ int main(void)
     HAL_UART_Transmit(&huart2, adc_value_as_hex, sizeof(adc_value_as_hex), 1000);
     HAL_UART_Transmit(&huart2, (uint8_t *) "\n", 1, 1000);
 
-    // Prepare data packet with dummy data
-    uint8_t nRF24_payload[32];
-    int payload_length = 5;
-    for (int payload_byte_index = 0;
-      payload_byte_index < payload_length;
-      payload_byte_index++) {
-        nRF24_payload[payload_byte_index] = j++;
-        if (j > 0x000000FF) j = 0;
+    // Prefix payload with Device ID
+    uint8_t report_packet[3];
+    report_packet[0] = DEVICE_ID;
+
+    // Fill payload of packet with dummy data
+    report_packet[1] = j;
+    j++;
+    report_packet[2] = j;
+    j++;
+    if (j > 0x000000FF)
+    {
+      j = 0;
     }
 
     // Transmit a packet
-    nRF24_TXResult transmit_result = nRF24_TransmitPacket(nRF24_payload, payload_length);
+    nRF24_TXResult transmit_result = nRF24_TransmitPacket(report_packet, sizeof(report_packet));
 
     switch (transmit_result) {
         case nRF24_TX_SUCCESS:

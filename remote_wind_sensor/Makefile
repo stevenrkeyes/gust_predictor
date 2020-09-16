@@ -134,6 +134,13 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
 endif
 
+# Device ID between 0 and 254 should be provided by the user
+ifdef DEVICE_ID
+CFLAGS += -DDEVICE_ID=$(DEVICE_ID)
+else
+# If none is provided, use the special number 255
+CFLAGS += -DDEVICE_ID=255
+endif
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
