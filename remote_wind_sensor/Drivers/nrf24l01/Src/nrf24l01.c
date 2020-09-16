@@ -3,35 +3,35 @@
 #include "nrf24l01.h"
 
 // Private configuration information for device
-SPI_HandleTypeDef *_nrf24l01_spi_handle;
-GPIO_TypeDef      *_nRF24l01_ce_port;
-uint16_t           _nRF24l01_ce_pin;
-GPIO_TypeDef      *_nRF24l01_csn_port;
-uint16_t           _nRF24l01_csn_pin;
+static SPI_HandleTypeDef *nrf24l01_spi_handle;
+static GPIO_TypeDef      *nRF24l01_ce_port;
+static uint16_t           nRF24l01_ce_pin;
+static GPIO_TypeDef      *nRF24l01_csn_port;
+static uint16_t           nRF24l01_csn_pin;
 
-// CSN is the SPI chip select
+// CSN is the SPI chip select (active low)
 static inline void nRF24_CSN_L() {
-    HAL_GPIO_WritePin(_nRF24l01_csn_port, _nRF24l01_csn_pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(nRF24l01_csn_port, nRF24l01_csn_pin, GPIO_PIN_RESET);
 }
 
 static inline void nRF24_CSN_H() {
-    HAL_GPIO_WritePin(_nRF24l01_csn_port, _nRF24l01_csn_pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(nRF24l01_csn_port, nRF24l01_csn_pin, GPIO_PIN_SET);
 }
 
 // CE controls the standby mode
 static inline void nRF24_CE_L() {
-    HAL_GPIO_WritePin(_nRF24l01_ce_port, _nRF24l01_ce_pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(nRF24l01_ce_port, nRF24l01_ce_pin, GPIO_PIN_RESET);
 }
 
 static inline void nRF24_CE_H() {
-    HAL_GPIO_WritePin(_nRF24l01_ce_port, _nRF24l01_ce_pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(nRF24l01_ce_port, nRF24l01_ce_pin, GPIO_PIN_SET);
 }
 
 
 static inline uint8_t nRF24_LL_RW(uint8_t write_data) {
     // Wait until TX buffer is empty
     uint8_t read_data;
-    HAL_SPI_TransmitReceive(_nrf24l01_spi_handle, &write_data, &read_data, 1, 2000);
+    HAL_SPI_TransmitReceive(nrf24l01_spi_handle, &write_data, &read_data, 1, 2000);
     return read_data;
 }
 
@@ -103,13 +103,13 @@ static void nRF24_WriteMBReg(uint8_t reg, uint8_t *pBuf, uint8_t count) {
 
 // Set transceiver to its initial state
 // note: RX/TX pipe addresses remains untouched
-void nRF24_Init(SPI_HandleTypeDef *nrf24l01_spi_handle, GPIO_TypeDef *nRF24l01_ce_port, uint16_t nRF24l01_ce_pin,
-	GPIO_TypeDef *nRF24l01_csn_port, uint16_t nRF24l01_csn_pin) {
-	_nrf24l01_spi_handle = nrf24l01_spi_handle;
-	_nRF24l01_ce_port = nRF24l01_ce_port;
-    _nRF24l01_ce_pin = nRF24l01_ce_pin;
-    _nRF24l01_csn_port = nRF24l01_csn_port;
-    _nRF24l01_csn_pin = nRF24l01_csn_pin;
+void nRF24_Init(SPI_HandleTypeDef *spi_handle, GPIO_TypeDef *ce_port, uint16_t ce_pin, GPIO_TypeDef *csn_port,
+	uint16_t csn_pin) {
+	nrf24l01_spi_handle = spi_handle;
+	nRF24l01_ce_port = ce_port;
+    nRF24l01_ce_pin = ce_pin;
+    nRF24l01_csn_port = csn_port;
+    nRF24l01_csn_pin = csn_pin;
 }
 
 void nRF24_Start(void) {

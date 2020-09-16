@@ -77,6 +77,12 @@ void uint16_to_hex(uint8_t dest[], uint16_t value)
   dest[0] = HEX_DIGITS[(value & 0xF000) >> 12];
 }
 
+#pragma pack(1)
+typedef struct {
+  uint8_t  device_id;
+  uint16_t wind_measurement_raw;
+} report_packet_t;
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -178,12 +184,7 @@ int main(void)
     HAL_UART_Transmit(&huart2, (uint8_t *) "\n", 1, 1000);
 
     // Prefix payload with Device ID
-    #pragma pack(1)
-    struct remote_report_packet {
-      uint8_t device_id;
-      uint16_t wind_measurement_raw;
-    } report_packet;
-
+    report_packet_t report_packet = {0};
     report_packet.device_id = DEVICE_ID;
     report_packet.wind_measurement_raw = adc_value;
 

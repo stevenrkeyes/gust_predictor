@@ -192,8 +192,8 @@ static const uint8_t nRF24_ADDR_REGS[7] = {
 
 
 // Function prototypes
-void nRF24_Init(SPI_HandleTypeDef *nrf24l01_spi_handle, GPIO_TypeDef *nRF24l01_ce_port, uint16_t nRF24l01_ce_pin,
-	GPIO_TypeDef *nRF24l01_csn_port, uint16_t nRF24l01_csn_pin);
+void nRF24_Init(SPI_HandleTypeDef *spi_handle, GPIO_TypeDef *ce_port, uint16_t ce_pin, GPIO_TypeDef *csn_port,
+	uint16_t csn_pin);
 uint8_t nRF24_Check(void);
 void nRF24_Start(void);
 
