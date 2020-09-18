@@ -692,7 +692,6 @@ nRF24_TXResult nRF24_TransmitPacket(uint8_t *pBuf, uint8_t length)
 
   // Some banana happens, a payload remains in the TX FIFO, flush it
   nRF24_FlushTX();
-  //   HAL_UART_Transmit(&huart2, (uint8_t *)"h", 2, 1000);
 
   return nRF24_TX_ERROR;
 }
