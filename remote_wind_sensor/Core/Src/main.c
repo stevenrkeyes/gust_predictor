@@ -17,7 +17,8 @@ static void uint16_to_hex(uint8_t dest[], uint16_t value)
 }
 
 #pragma pack(1)
-typedef struct {
+typedef struct
+{
   uint8_t  device_id;
   uint16_t wind_measurement_raw;
 } report_packet_t;
@@ -47,9 +48,12 @@ int main(void)
   nRF24_Init(&hspi1, GPIOA, Aux_Out_1_Pin, GPIOA, Radio_NSS_Pin);
 
   uint8_t check_result = nRF24_Check();
-  if (check_result == 1) {
+  if (check_result == 1)
+  {
     HAL_UART_Transmit(&huart2, (uint8_t *)"radio good\n", 11, 1000);
-  } else {
+  }
+  else
+  {
     HAL_UART_Transmit(&huart2, (uint8_t *)"radio bad\n", 10, 1000);
   }
 
@@ -103,19 +107,20 @@ int main(void)
     // Transmit a packet
     nRF24_TXResult transmit_result = nRF24_TransmitPacket((uint8_t *) &report_packet, sizeof(report_packet));
 
-    switch (transmit_result) {
-        case nRF24_TX_SUCCESS:
-            HAL_UART_Transmit(&huart2, (uint8_t *) "OK\n", 3, 1000);
-            break;
-        case nRF24_TX_TIMEOUT:
-            HAL_UART_Transmit(&huart2, (uint8_t *) "TIMEOUT\n", 8, 1000);
-            break;
-        case nRF24_TX_MAXRT:
-            HAL_UART_Transmit(&huart2, (uint8_t *) "MAX RETRANSMIT\n", 15, 1000);
-            break;
-        default:
-            HAL_UART_Transmit(&huart2, (uint8_t *) "ERROR\n", 6, 1000);
-            break;
+    switch (transmit_result)
+    {
+    case nRF24_TX_SUCCESS:
+      HAL_UART_Transmit(&huart2, (uint8_t *) "OK\n", 3, 1000);
+      break;
+    case nRF24_TX_TIMEOUT:
+      HAL_UART_Transmit(&huart2, (uint8_t *) "TIMEOUT\n", 8, 1000);
+      break;
+    case nRF24_TX_MAXRT:
+      HAL_UART_Transmit(&huart2, (uint8_t *) "MAX RETRANSMIT\n", 15, 1000);
+      break;
+    default:
+      HAL_UART_Transmit(&huart2, (uint8_t *) "ERROR\n", 6, 1000);
+      break;
     }
 
     HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);

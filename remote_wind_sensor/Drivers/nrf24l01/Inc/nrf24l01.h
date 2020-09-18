@@ -123,14 +123,15 @@
 #define nRF24_DPL_OFF (uint8_t)0x00 // PTX
 
 // RX pipe addresses and TX address
-enum {
-	nRF24_PIPE0  = 0x00, // pipe0
-	nRF24_PIPE1  = 0x01, // pipe1
-	nRF24_PIPE2  = 0x02, // pipe2
-	nRF24_PIPE3  = 0x03, // pipe3
-	nRF24_PIPE4  = 0x04, // pipe4
-	nRF24_PIPE5  = 0x05, // pipe5
-	nRF24_PIPETX = 0x06  // TX address (not a pipe in fact)
+enum
+{
+  nRF24_PIPE0  = 0x00, // pipe0
+  nRF24_PIPE1  = 0x01, // pipe1
+  nRF24_PIPE2  = 0x02, // pipe2
+  nRF24_PIPE3  = 0x03, // pipe3
+  nRF24_PIPE4  = 0x04, // pipe4
+  nRF24_PIPE5  = 0x05, // pipe5
+  nRF24_PIPETX = 0x06  // TX address (not a pipe in fact)
 };
 
 // State of auto acknowledgment for specified pipe
@@ -150,50 +151,48 @@ enum {
 #define nRF24_STATUS_TXFIFO_ERROR (uint8_t)0x03 // Impossible state: TX FIFO cannot be empty and full at the same time
 
 // Result of RX FIFO reading
-typedef enum {
-	nRF24_RX_PIPE0  = 0x00, // Packet received from the PIPE#0
-	nRF24_RX_PIPE1  = 0x01, // Packet received from the PIPE#1
-	nRF24_RX_PIPE2  = 0x02, // Packet received from the PIPE#2
-	nRF24_RX_PIPE3  = 0x03, // Packet received from the PIPE#3
-	nRF24_RX_PIPE4  = 0x04, // Packet received from the PIPE#4
-	nRF24_RX_PIPE5  = 0x05, // Packet received from the PIPE#5
-	nRF24_RX_EMPTY  = 0xff  // The RX FIFO is empty
+typedef enum
+{
+  nRF24_RX_PIPE0  = 0x00, // Packet received from the PIPE#0
+  nRF24_RX_PIPE1  = 0x01, // Packet received from the PIPE#1
+  nRF24_RX_PIPE2  = 0x02, // Packet received from the PIPE#2
+  nRF24_RX_PIPE3  = 0x03, // Packet received from the PIPE#3
+  nRF24_RX_PIPE4  = 0x04, // Packet received from the PIPE#4
+  nRF24_RX_PIPE5  = 0x05, // Packet received from the PIPE#5
+  nRF24_RX_EMPTY  = 0xff  // The RX FIFO is empty
 } nRF24_RXResult;
 
 // Result of packet transmission
-typedef enum {
-    nRF24_TX_ERROR  = 0x00, // Unknown error
-    nRF24_TX_SUCCESS,       // Packet has been transmitted successfully
-    nRF24_TX_TIMEOUT,       // Timeout during packet transmit
-    nRF24_TX_MAXRT          // Transmit failed with maximum auto retransmit count
+typedef enum
+{
+  nRF24_TX_ERROR  = 0x00, // Unknown error
+  nRF24_TX_SUCCESS,       // Packet has been transmitted successfully
+  nRF24_TX_TIMEOUT,       // Timeout during packet transmit
+  nRF24_TX_MAXRT          // Transmit failed with maximum auto retransmit count
 } nRF24_TXResult;
 
 
 // Addresses of the RX_PW_P# registers
-static const uint8_t nRF24_RX_PW_PIPE[6] = {
-		nRF24_REG_RX_PW_P0,
-		nRF24_REG_RX_PW_P1,
-		nRF24_REG_RX_PW_P2,
-		nRF24_REG_RX_PW_P3,
-		nRF24_REG_RX_PW_P4,
-		nRF24_REG_RX_PW_P5
-};
+static const uint8_t nRF24_RX_PW_PIPE[6] = {nRF24_REG_RX_PW_P0,
+                                            nRF24_REG_RX_PW_P1,
+                                            nRF24_REG_RX_PW_P2,
+                                            nRF24_REG_RX_PW_P3,
+                                            nRF24_REG_RX_PW_P4,
+                                            nRF24_REG_RX_PW_P5};
 
 // Addresses of the address registers
-static const uint8_t nRF24_ADDR_REGS[7] = {
-		nRF24_REG_RX_ADDR_P0,
-		nRF24_REG_RX_ADDR_P1,
-		nRF24_REG_RX_ADDR_P2,
-		nRF24_REG_RX_ADDR_P3,
-		nRF24_REG_RX_ADDR_P4,
-		nRF24_REG_RX_ADDR_P5,
-		nRF24_REG_TX_ADDR
-};
+static const uint8_t nRF24_ADDR_REGS[7] = {nRF24_REG_RX_ADDR_P0,
+                                           nRF24_REG_RX_ADDR_P1,
+                                           nRF24_REG_RX_ADDR_P2,
+                                           nRF24_REG_RX_ADDR_P3,
+                                           nRF24_REG_RX_ADDR_P4,
+                                           nRF24_REG_RX_ADDR_P5,
+                                           nRF24_REG_TX_ADDR};
 
 
 // Function prototypes
 void nRF24_Init(SPI_HandleTypeDef *spi_handle, GPIO_TypeDef *ce_port, uint16_t ce_pin, GPIO_TypeDef *csn_port,
-	uint16_t csn_pin);
+                uint16_t csn_pin);
 uint8_t nRF24_Check(void);
 void nRF24_Start(void);
 
