@@ -39,6 +39,7 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/stm32l0xx_it.c \
 Core/Src/stm32l0xx_hal_msp.c \
+Core/Src/system_initialization.c \
 Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_adc.c \
 Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_adc_ex.c \
 Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal.c \
