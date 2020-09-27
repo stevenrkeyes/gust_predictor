@@ -33,13 +33,15 @@ while True:
         report_packet_flattened_struct = radio.get_payload()
 
         # Unpack the data, which is a uint8 ('B') and a uint16 ('h')
-        report_packet = struct.unpack('=Bh', report_packet_flattened_struct)
+        report_packet = struct.unpack('=Bhh', report_packet_flattened_struct)
 
         # The radio payload is a wind report packet consisting of device ID and data
         device_id = report_packet[0]
         wind_measurement_raw = report_packet[1]
+        temperature_measurement_raw = report_packet[2]
 
         pipe_string = "Pipe " + str(pipe)
         device_string = "Device " + str(device_id).zfill(3)
-        data_string = str(wind_measurement_raw)
-        print(", ".join([pipe_string, device_string, data_string]))
+        wind_string = str(wind_measurement_raw)
+        temperature_string = str(temperature_measurement_raw)
+        print(", ".join([pipe_string, device_string, wind_string, temperature_string]))

@@ -21,6 +21,7 @@ typedef struct
 {
   uint8_t  device_id;
   uint16_t wind_measurement_raw;
+  uint16_t temperature_measurement_raw;
 } report_packet_t;
 
 int main(void)
@@ -91,10 +92,12 @@ int main(void)
   {
     HAL_ADC_Start(&hadc);
     HAL_ADC_PollForConversion(&hadc, 1000);
-    uint16_t adc_value = HAL_ADC_GetValue(&hadc);
+    uint16_t adc_value_channel_0 = HAL_ADC_GetValue(&hadc);
+    HAL_ADC_PollForConversion(&hadc, 1000);
+    uint16_t adc_value_channel_1 = HAL_ADC_GetValue(&hadc);
 
     uint8_t adc_value_as_hex[4];
-    uint16_to_hex(adc_value_as_hex, adc_value);
+    uint16_to_hex(adc_value_as_hex, adc_value_channel_0);
 
     HAL_UART_Transmit(&huart2, adc_value_as_hex, sizeof(adc_value_as_hex), 1000);
     HAL_UART_Transmit(&huart2, (uint8_t *) "\n", 1, 1000);
@@ -102,7 +105,8 @@ int main(void)
     // Prefix payload with Device ID
     report_packet_t report_packet = {0};
     report_packet.device_id = DEVICE_ID;
-    report_packet.wind_measurement_raw = adc_value;
+    report_packet.wind_measurement_raw = adc_value_channel_0;
+    report_packet.temperature_measurement_raw = adc_value_channel_1;
 
     // Transmit a packet
     nRF24_TXResult transmit_result = nRF24_TransmitPacket((uint8_t *) &report_packet, sizeof(report_packet));
