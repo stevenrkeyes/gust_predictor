@@ -76,7 +76,7 @@ void ADC_Init(ADC_HandleTypeDef *hadc)
   hadc->Init.OversamplingMode = DISABLE;
   hadc->Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
   hadc->Init.Resolution = ADC_RESOLUTION_12B;
-  hadc->Init.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  hadc->Init.SamplingTime = ADC_SAMPLETIME_160CYCLES_5;
   hadc->Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
   hadc->Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc->Init.ContinuousConvMode = DISABLE;
