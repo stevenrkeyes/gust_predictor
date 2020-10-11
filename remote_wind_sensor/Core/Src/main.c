@@ -95,6 +95,7 @@ int main(void)
     uint16_t adc_value_channel_0 = HAL_ADC_GetValue(&hadc);
     HAL_ADC_PollForConversion(&hadc, 1000);
     uint16_t adc_value_channel_1 = HAL_ADC_GetValue(&hadc);
+    HAL_ADC_Stop(&hadc);
 
     uint8_t adc_value_as_hex[4];
     uint16_to_hex(adc_value_as_hex, adc_value_channel_0);
