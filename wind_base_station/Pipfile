@@ -7,6 +7,7 @@ verify_ssl = true
 
 [packages]
 nrf24 = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"
