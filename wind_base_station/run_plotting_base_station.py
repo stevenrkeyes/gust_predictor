@@ -1,7 +1,7 @@
 from multiprocessing import Process, Pipe
 
-from run_radio_listener import run_radio_listener
-from run_data_plotter import run_data_plotter
+from radio_listener import run_radio_listener
+from data_plotter import run_data_plotter
 
 # The plotting base station consists of a radio listening process sending data
 # to a plotting process through a pipe
