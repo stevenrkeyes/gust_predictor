@@ -20,12 +20,14 @@ def run_data_plotter(connection):
                 timestamps_by_device[device_id].append(timestamp)
                 wind_values_by_device[device_id].append(wind_value_raw)
             wind_subplot.clear()
+            wind_subplot.set_xlabel("Time")
+            wind_subplot.set_ylabel("Measurement (Raw Value)")
             for device_id in device_ids:
                 timestamps = timestamps_by_device[device_id]
                 if len(timestamps) > 0:
                     wind_values = wind_values_by_device[device_id]
                     wind_subplot.plot(timestamps, wind_values, label=str(device_id))
-            plt.legend()
+            plt.legend(title="Device ID")
 
     animation_object = animation.FuncAnimation(figure, animate, interval=50)
     print("Starting plot")
