@@ -27,6 +27,6 @@ def run_data_plotter(connection):
                     wind_subplot.plot(timestamps, wind_values, label=str(device_id))
             plt.legend()
 
-    animation_object = animation.FuncAnimation(figure, animate, interval=1000)
+    animation_object = animation.FuncAnimation(figure, animate, interval=50)
     print("Starting plot")
     plt.show()
