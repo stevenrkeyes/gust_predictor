@@ -9,10 +9,14 @@ Once you have some remote sensors set up and running, you can start the base sta
 `sudo pigpiod`
 
 ### Plot data live
-`pipenv run python run_plotting_base_station.py`
+`./start_radio_relay_and_plotter.sh`
 
 ### Save data
 `pipenv run python run_data_logger_base_station.py`
 
 ### Replay saved data
-`pipenv run python run_replay_plotting_base_station.py <name_of_log_file>`
+`pipenv run python run_replay_publisher.py <name_of_log_file>`
+
+If you'd like to display this data as well, run:
+
+`pipenv run python run_data_plotter_subscriber.py`
